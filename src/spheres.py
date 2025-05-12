@@ -90,7 +90,8 @@ def create_label_map(volume_labels, slice_labels):
     return label_map
 
 
-def calc_2d_roundness(vol_numpy, label_img, start=0, end=None, step=1, return_obj=False):
+def calc_2d_roundness(vol_numpy, label_img, start=0, end=None, step=1,
+                      return_obj=False, warnings=False):
     """
     Calculates the 2D roundness of all objects in all slices in a volume.
 
@@ -129,11 +130,13 @@ def calc_2d_roundness(vol_numpy, label_img, start=0, end=None, step=1, return_ob
     obj_dict_lists = []
     roundness_values = []
     for iSlice in range(start, end, step):
-        print(f'Slice number {iSlice}')
+        if warnings:
+            print(f'Slice number {iSlice}')
         roundness_values.append([])
         edt_img = edt.edt(vol_numpy[iSlice])  # Calculate distance transform
 
-        obj_dict_list = common.characterize_objects(label_img[iSlice], edt_img) # Collect characteristics about binary objects
+        obj_dict_list = common.characterize_objects(label_img[iSlice], edt_img,
+                                                    warnings=warnings)  # Collect characteristics about binary objects
         obj_dict_lists.append(obj_dict_list)
         for obj_dict in obj_dict_list:
             roundness_value = roundness.calculate_roundness(
@@ -143,7 +146,7 @@ def calc_2d_roundness(vol_numpy, label_img, start=0, end=None, step=1, return_ob
                     smoothing_method=smoothing_method,
                     alpha_ratio=alpha_ratio,
                     beta_ratio=beta_ratio,
-                    verbose=True
+                    verbose=True,
                 )
             roundness_values[iSlice].append({'roundness_value': roundness_value,
                                              'slice_label': obj_dict['slice_label']})
