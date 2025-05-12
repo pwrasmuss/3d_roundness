@@ -7,7 +7,7 @@ from .external import smallestenclosingcircle as sec
 from . import util
 
 
-def characterize_objects(label_img, dist_img):
+def characterize_objects(label_img, dist_img, warnings=False):
     """Collects properties and boundary points of the objects in the image.
     Called "discrete_boundary" in the original code.
     Arguments:
@@ -39,10 +39,12 @@ def characterize_objects(label_img, dist_img):
         dist_img_prop[label_img != prop.label] = 0
 
         if len(prop.coords) < 5:
-            print(f'Too few pixels ({len(prop.coords)}) in region to provide a roundness.')
+            if warnings:
+                print(f'Too few pixels ({len(prop.coords)}) in region to provide a roundness.')
             continue
 
-        boundary_vals = boundary.boundary_tracing(prop, label_img.shape)
+        boundary_vals = boundary.boundary_tracing(prop, label_img.shape,
+                                                  warnings=warnings)
         if boundary_vals is None:
             continue
 
