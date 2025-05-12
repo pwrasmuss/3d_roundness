@@ -35,7 +35,7 @@ def moore_neighborhood(current, backtrack):  # y, x
     return 0
 
 
-def boundary_tracing(region, im_shape):
+def boundary_tracing(region, im_shape, warnings=False):
     """Coordinates of the region's boundary. The region must not have isolated
     points.
 
@@ -57,7 +57,8 @@ def boundary_tracing(region, im_shape):
     row_limit = ((coords[:, 0] == 0).any() or (coords[:, 0] == (im_shape[0] - 1)).any())
     col_limit = ((coords[:, 1] == 0).any() or (coords[:, 1] == (im_shape[1] - 1)).any())
     if row_limit or col_limit:
-        print('Region is on the border.')
+        if warnings:
+            print('Region is on the border.')
         return None
     # print('coords', coords)
     maxs = np.max(coords, axis=0)
@@ -89,7 +90,8 @@ def boundary_tracing(region, im_shape):
         idx_start += 1
 
         if idx_start == len(x):
-            print('Starting point might be isolated.')
+            if warnings:
+                print('Starting point might be isolated.')
             return None
 
     # Determining backtrack pixel for the first element
@@ -121,7 +123,8 @@ def boundary_tracing(region, im_shape):
         #       'backtrack/backtrack_start:', backtrack, backtrack_start)
 
         if counter > len(coords):
-            print("Boundary couldn't be ordered in a reasonable number of steps.")
+            if warnings:
+                print("Boundary couldn't be ordered in a reasonable number of steps.")
             return None
 
         if np.all(current == start) and np.all(backtrack == backtrack_start):
